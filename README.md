@@ -4,8 +4,8 @@
 
 A parser combinator in Javascript ( Node.js) for combining primitive parser functions to create simple DSLs
 
-Writing the documentation for momething like this is more complicated than writing the code! See the example file to get 
-a hang on how t0 use this!
+Writing the documentation for something like this is more complicated than writing the code! See the example file to get 
+a hang on how to use this! 
 ## Objective
 
 At the basic level it uses function composition to build larger recognizers from primitive ones. The parseUnit is similar
@@ -22,9 +22,9 @@ This is menat of node.js. Please ensure that the paths are correct in require();
 
 ## Usage
 
-1. pCombinator.js. contains the core functions that enable creation of parser combinators
+### 1. pCombinator.js. contains the core functions that enable creation of parser combinators
 
-1.1 parserUnit(parseExpr, tokenType,[optional tranformToken])
+#### 1.1 parserUnit(parseExpr, tokenType,[optional tranformToken])
 
 parameters:
     parserExp: can be any one of the following:
@@ -60,7 +60,7 @@ Using the transform function:
 	result=letter(new Context('a')); result.result=true, result.tokens[0].value='A';<---
 	
  
-1.2 or(tokenType, reduce,fn,alt)
+#### 1.2 or(tokenType, reduce,fn,alt)
 
 parameters: 
   	tokenType- string same as in anyother function
@@ -94,7 +94,7 @@ examples:
  	reduce function can also be used in the same manner as the tranform argument above for modifying 
  	the token in some way before it is pushed to the result.tokens.								
 	
-1.3 zeroOrMore=function (fn,tokenType,tranformToken)
+#### 1.3 zeroOrMore=function (fn,tokenType,tranformToken)
 
 returns a function that looks for a token defined by fn and creates a token of tokenType.
 Since this is detects zero or more occurrences it the returned context will always have its 
@@ -134,7 +134,7 @@ result= zeroOrMoreDigits(new Context("100"));
 			result.tokens[0].value="100";
 			result.tones[0].type="someOrNoDigits";
 		
-1.4 sequence(tokenType,transformToken, fn1,fn2,fn3....)
+#### 1.4 sequence(tokenType,transformToken, fn1,fn2,fn3....)
 
 As the name suggest those function composes a function out of the fn1, fn2  fn3 .. etc'
 Tokentype and tranformToken are the same as for zeroOrMore() above.
@@ -155,13 +155,13 @@ var identifier=sequence("Identifier",merge,letter,somrOrNoLettersOrDigits);
  		result.result=true;
  		result.tokens[0].value="Aa1";
  		
-1.5 oneOf(tokenType,transformToken, fn1,fn2,fn3...)
+#### 1.5 oneOf(tokenType,transformToken, fn1,fn2,fn3...)
 
 works exactly like or() above except with more than 2 functions .
 In fact or() is just a syntactic sugar function that calls oneOf with two functions.
 
 
-2. lexer.js
+### 2. lexer.js
 
 Defines a simple lexical analyser has the following functions
 
@@ -184,7 +184,7 @@ constuctor Lex(Stream);
  	
  Please ensure that yoru lexer has the same member functions as above with the same signatures!
 							
-3. Context.js
+### 3. Context.js
 Trivial
  usage:
  
