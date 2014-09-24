@@ -8,13 +8,29 @@ exports.Lex= function (stream){
 	this.line=0;
 	this.col=0;
 	this.lastToken=null;
+	this.skipWhiteSpaces();		
 	return this;
 };
+
+exports.Lex.prototype.skipWhiteSpaces=function(){
+	while(this.pos<this.stream.length){
+		var c=this.stream.charAt(this.pos);
+		if(c==' ' || c=='\t' || c=='\r' || c=='\n'){
+			if(c=='\n'){
+				this.line++;
+				this.col=0;
+				}
+			this.pos++;
+			}
+		else break;
+	}	
+	return this;
+}
 
 exports.Lex.prototype.advance=function(by){
 	var inc=by || 1;
 	this.pos+=inc;
-		
+	this.skipWhiteSpaces();	
 	return this;
 };
 
@@ -27,9 +43,9 @@ exports.Lex.prototype.matchFromList=function (list){
 			break;
 		}
 	}
- 
+	 
 	return result;
-}
+};
 
 exports.Lex.prototype.getToken= function (){
 	this.lastToken=null;

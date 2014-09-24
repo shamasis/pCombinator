@@ -1,0 +1,78 @@
+/**
+ * New node file
+ */
+var cparser=require("./pCombinator.js");
+ 
+var Context=require("./context.js").Context;
+
+var parserUnit=cparser.parserUnit;
+var or=cparser.or;
+var zeroOrMore=cparser.zeroOrMore;
+var sequence=cparser.sequence;
+var oneOf=cparser.oneOf;
+var zeroOrOne=cparser.zeroOrOne;
+var oneOrMore=cparser.oneOrMore;
+
+
+var mergeTokens=function(tok){
+	return tok.mergeChildren();
+};
+
+
+var reduce=mergeTokens;
+
+var digit=parserUnit(["1","2","3","4","5","6","7","8","9","0"],"DIGIT");
+var operator=parserUnit(["+","-","*","/","%"],"OP");
+var assignment=parserUnit("=","ASS");
+var compop=parserUnit(["==","<=",">=","!="],"COMPOP");
+var ifkw=parserUnit(["if"],"IF");
+var elseifkw=parserUnit(["elseif"],"ELSEIF");
+var elsekw=parserUnit(["else"],"ELSE")
+ // var spaces=zeroOrMore(parserUnit([" ","\t",'\n'],"SPACES",reduce));
+var eos=parserUnit(";","EOS");
+
+
+var letter=parserUnit(/^[A-Za-z]/,"LETTER");
+var letterOrDigit=oneOf("letterOrDigit",null,letter,digit);
+
+ 
+var num=sequence("Number",reduce,digit,zeroOrMore(digit,"zeroOrMoreDigits",reduce));
+var identifier=sequence("IDENTIFIER",reduce,letter,zeroOrMore(letterOrDigit,"manyLettersOrDigits",reduce));
+ 
+var term= oneOf("TERM",reduce,identifier,num);
+//define expression as a sequence of terme, operator and term
+var expr=sequence("EXPR",null,term,operator,term);
+var compexp=sequence("COMPEXP",null,term,compop,term);
+var assign=sequence("assignment",null,identifier,assignment,expr,eos);
+var ifExp= sequence('IF_STATEMENT',null,ifkw,compexp, assign); 
+var elseifExp=sequence('ELSEIF_STATEMENT', null,
+						elseifkw,compexp,assign);
+var elseExp=sequence('ELSE_STATEMENT', null,elsekw,assign);
+
+var ifelseChain=sequence("IFELSE_CHAIN",null,
+							ifExp,
+							zeroOrMore(elseifExp, "ELSEIF_LIST"),
+							zeroOrOne(elseExp,"ELSE_PART"))
+var stmt=oneOf("Statement",null,ifelseChain,assign);
+var program=oneOrMore(stmt,"Program");
+ 
+
+var stream= "z=1+1; if x==1 y=y+3; elseif x==1 y=y+3; else y=y+4;"
+ 
+test(program,"z=z+1;if x==1 y=y+0; elseif x==2 y=y+1; elseif x==3 y=y+2; else y=y+3;");
+
+function test(fn,str){
+	var result=fn(new Context(str));
+
+	console.log("result="+result.result," ", result.tokens.length);
+	if(result.result){
+		
+		for(var i=0;i<result.tokens.length;i++){
+			console.log("Token= ", i)
+			console.log(result.tokens[i].toString());
+		}
+	}
+	else
+		console.log(result.expected+ " at " + result.lexer.pos)
+}
+

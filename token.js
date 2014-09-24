@@ -20,13 +20,17 @@ exports.Token.prototype.mergeChildren=function(){
 
 exports.Token.prototype.pretty= function(depth){
 	var result;
-	var pad="  ";
+	var pad="";
+	var padval="  "
 	for(var i=0;i<depth;i++)
-		pad+=pad;
+		pad+=padval;
+	var cs="C";
+	for(i=0;i< depth;i++)
+		cs+="C";
 	result="  Type="+this.type+ " Value: "+ this.value +"\n";
 	for(i=0;i<this.children.length;i++){
-		result+=pad+"C"+i;
-		result+=this.children[i].pretty(depth+1)+"\n";
+		result+=pad+cs+i;
+		result+=this.children[i].pretty(depth+1);
 	}	
 return result;
 }

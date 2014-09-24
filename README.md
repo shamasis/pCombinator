@@ -94,7 +94,7 @@ examples:
  	reduce function can also be used in the same manner as the tranform argument above for modifying 
  	the token in some way before it is pushed to the result.tokens.								
 	
-#### 1.3 zeroOrMore=function (fn,tokenType,tranformToken)
+#### 1.3 zeroOrMore(fn,tokenType,tranformToken)
 
 returns a function that looks for a token defined by fn and creates a token of tokenType.
 Since this is detects zero or more occurrences it the returned context will always have its 
@@ -160,7 +160,13 @@ var identifier=sequence("Identifier",merge,letter,somrOrNoLettersOrDigits);
 works exactly like or() above except with more than 2 functions .
 In fact or() is just a syntactic sugar function that calls oneOf with two functions.
 
+#### 1.6 zeroOrOne(fn,tokenType,tranformToken)
 
+Works like zeroOrMore above- except matches only one instance or zero. In both cases it returns true.
+#### 1.7 oneOrMore(fn,tokentype, transformToken)
+
+Works like zeroOrMore or zeroOrOne
+Returns true only if at least one match is found
 ### 2. lexer.js
 
 Defines a simple lexical analyser has the following functions

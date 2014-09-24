@@ -51,6 +51,7 @@ exports.or=function (tokenType, transformToken,fn,alt){
 exports.zeroOrMore=function (fn,tokenType,transformToken){
 	return function(context){
 		var count=0;
+		var tok;
 		context=fn(context);
 		while(context.result){
 			count++;
@@ -58,7 +59,8 @@ exports.zeroOrMore=function (fn,tokenType,transformToken){
 			}
 		
 		if(count){
-			var tok=new Token(tokenType);
+			tok=new Token(tokenType);
+			
 			for(var i=0;i<count;i++){
 				tok.children[i]=context.tokens.pop();
 				}
@@ -68,8 +70,68 @@ exports.zeroOrMore=function (fn,tokenType,transformToken){
 				tok=transformToken(tok,context);
 			context.tokens.push(tok);
 		}
+		else {
+			tok=new Token(tokenType);
+			tok.type=tokenType;
+			tok.value='';
+			context.tokens.push(tok);
+		}
 		context.result=true;
 		context.expected=tokenType;
+		return context;
+	};
+};
+
+exports.oneOrMore=function (fn,tokenType,transformToken){
+	return function(context){
+		var count=0;
+		var tok;
+		context=fn(context);
+		while(context.result){
+			count++;
+			context=fn(context);
+			}
+		
+		if(count){
+			tok=new Token(tokenType);
+			context.result=true;
+			for(var i=0;i<count;i++){
+				tok.children[i]=context.tokens.pop();
+				}
+			tok.children=tok.children.reverse();
+			
+			if(transformToken)
+				tok=transformToken(tok,context);
+			context.tokens.push(tok);
+		}
+		else 
+			 context.result=false;
+		context.expected=tokenType;
+		return context;
+	};
+};
+
+exports.zeroOrOne=function (fn,tokenType,transformToken){
+	return function(context){
+		var tok;
+		context=fn(context);
+		
+		if(context.result){
+			tok=context.tokens.pop();
+			tok.type=tokenType || tok.type;
+			if(transformToken)
+				tok=transformToken(tok,context);
+			 
+		}
+		else {
+			tok=new Token(tokenType);
+		
+			tok.value='';
+			 
+		}
+		context.result=true;
+		context.expected=tokenType;
+		context.tokens.push(tok);
 		return context;
 	};
 };
@@ -85,12 +147,15 @@ exports.sequence=function(tokenType,transformToken){
 			count++;
 		}
 		
+		
 		if(context.result){
+			
 			var tok=new Token(tokenType);
 			for(i=0;i<count;i++){
 				tok.children[i]=context.tokens.pop();
 				}
 			tok.children=tok.children.reverse();
+			 
 			if(transformToken)
 				tok=transformToken(tok,context);
 			context.tokens.push(tok); 
@@ -113,9 +178,9 @@ exports.oneOf= function(tokenType,transformToken){
 				break;
 		}
 		if(context.result){
-			
-			var tok=context.tokens.pop();
-			tok.type=tokenType || tok.type;
+			var tok=new Token(tokenType);
+			tok.children[0]=context.tokens.pop();
+			tok.value=tok.children[0].value;
 			if(transformToken)
 				tok=transformToken(tok,context);
 			context.tokens.push(tok);
